@@ -20,12 +20,18 @@ app.get("/getPokemons", (req, resp) => {
   });
 });
 
-app.post("/postPokemons", async (req, resp) => {
+app.post("/postPokemons", (req, resp) => {
   const pokemon = req.body;
-  const newPokemon = new pokemonModel(pokemon);
-  await newPokemon.save();
 
-  resp.json(pokemon);
+  pokemonModel.findOne({ id: pokemon.id }).then(async (result) => {
+    if (!result) {
+      const newPokemon = new pokemonModel(pokemon);
+      await newPokemon.save();
+      resp.json(pokemon);
+    } else {
+      resp.json("Pokemon already exists in database");
+    }
+  });
 });
 
 app.listen(5000, () => {
